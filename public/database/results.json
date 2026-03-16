@@ -1,0 +1,12 @@
+[
+  {
+    "id": "r1",
+    "studentId": "s1",
+    "studentName": "Budi Santoso",
+    "school": "SDN 01 Jakarta",
+    "correct": 2,
+    "wrong": 1,
+    "score": 66.7,
+    "timestamp": "2026-03-15T10:00:00Z"
+  }
+]

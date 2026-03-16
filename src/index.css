@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text-main font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Layout */
+  .app-container {
+    @apply min-h-screen flex flex-col;
+  }
+
+  .main-content {
+    @apply flex-1 w-full max-w-[1200px] mx-auto p-6 md:p-8;
+  }
+
+  /* Components */
+  .card {
+    @apply bg-surface rounded-2xl shadow-md border border-border p-6 transition-all;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-base transition-all active:scale-[0.97] mb-1 select-none border-none cursor-pointer;
+  }
+
+  .btn:disabled {
+    @apply opacity-60 cursor-not-allowed scale-100;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white shadow-[0_4px_0_theme(colors.primary.hover)] active:translate-y-[4px] active:shadow-none active:mb-0;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white shadow-[0_4px_0_theme(colors.secondary.hover)] active:translate-y-[4px] active:shadow-none active:mb-0;
+  }
+
+  .btn-danger {
+    @apply bg-danger text-white shadow-[0_4px_0_theme(colors.danger.hover)] active:translate-y-[4px] active:shadow-none active:mb-0;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-text-main border-2 border-border active:translate-y-0 active:mb-1 hover:bg-background hover:border-text-muted;
+  }
+
+  /* Input Fields */
+  .input-group {
+    @apply mb-6;
+  }
+
+  .input-label {
+    @apply block font-bold mb-2 text-text-main;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-border rounded-xl text-base font-sans transition-all outline-none focus:border-primary focus:ring-4 focus:ring-primary/20;
+  }
+
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/50;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

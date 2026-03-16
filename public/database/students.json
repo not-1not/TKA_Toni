@@ -1,0 +1,16 @@
+[
+  {
+    "id": "s1",
+    "username": "budi123",
+    "password": "password",
+    "name": "Budi Santoso",
+    "school": "SDN 01 Jakarta"
+  },
+  {
+    "id": "s2",
+    "username": "siti456",
+    "password": "password",
+    "name": "Siti Aminah",
+    "school": "SDN 05 Jayapura"
+  }
+]

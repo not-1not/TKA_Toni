@@ -1,0 +1,41 @@
+subject,question,type,option_a,option_b,option_c,option_d,correct_answer,s1_text,s1_ans,s2_text,s2_ans,s3_text,s3_ans,active
+Matematika,"Rini memiliki 7/15 m pita, Ayaka 12/25 m, dan Diah 15/30 m. Tentukan kebenaran pernyataan.",TF,,,,,,Rini mempunyai pita lebih panjang dari Ayaka,Salah,Diah mempunyai pita lebih panjang dari Rini,Benar,Ayaka mempunyai pita lebih pendek dari Diah,Benar,Y
+Matematika,"Data kesukaan buku siswa: 7/20 novel, 3/12 cerpen, 18% biografi, sisanya ilmiah. Urutan dari paling banyak disukai adalah...",MC,"novel, ilmiah, cerpen, biografi","novel, ilmiah, biografi, cerpen","novel, cerpen, biografi, ilmiah","novel, cerpen, ilmiah, biografi",D,,,,,,,Y
+Matematika,"Kendaraan: 539 sepeda listrik, 19.138 sepeda motor, 10.354 mobil, 696 mikrobus. Tentukan benar atau salah.",TF,,,,,,Kendaraan roda dua berjumlah 19.687,Benar,Kendaraan roda empat berjumlah 11.050,Benar,Total kendaraan 30.627,Benar,Y
+Matematika,"Data panjang: tali 1,2 dm; pita 0,5 m; pipa 23 cm. Tentukan kebenaran pernyataan.",TF,,,,,,Selisih pita dan tali adalah 480 cm,Salah,Pita lebih panjang daripada tali dan pipa,Benar,Panjang tali + pipa = 35 cm,Benar,Y
+Matematika,Perjalanan Dani dari Gianyar ke Denpasar dan Badung. Lama perjalanan tanpa istirahat adalah...,MC,2 jam 35 menit,2 jam 45 menit,3 jam 35 menit,3 jam 45 menit,A,,,,,,,Y
+Matematika,Data olahraga siswa SD Tunas Harapan Bangsa. Tentukan benar atau salah.,TF,,,,,,Renang paling sedikit peminatnya,Salah,Sepak bola paling digemari,Benar,Basket + bulu tangkis = 46 siswa,Salah,Y
+Matematika,"Yasmin memiliki 56 mawar, 72 melati, 48 bunga matahari. Rangkaian bunga dibuat sama banyak.",MCMA,Rangkaian maksimal 8,Setiap rangkaian 9 melati dan 7 mawar,Setiap rangkaian 7 matahari dan 6 mawar,,"A,B",,,,,,,Y
+Matematika,"Bu Tania membeli 360 bolu, 420 lapis, 540 donat dan membaginya ke kotak sama banyak.",TF,,,,,,Setiap kotak 6 bolu dan 8 lapis,Salah,Setiap kotak 6 bolu dan 9 donat,Benar,Kotak maksimal 60,Benar,Y
+Matematika,"Paket sembako berisi 2,5 kg beras, 10 hg telur, dan dua gula @500 g.",TF,,,,,,Total berat 4500 gram,Benar,Berat telur lebih dari 1 kg,Salah,Satu gula tidak lebih berat dari telur,Benar,Y
+Matematika,Irwan bersepeda dengan kecepatan 2 m/detik.,TF,,,,,,Jarak 400 m ditempuh 200 detik,Benar,Jarak 360 m ditempuh 3 menit,Benar,Jarak 380 m kurang dari 3 menit,Salah,Y
+Matematika,"120% ? 3 + 2 � 0,75 + 2/3 = ...",MC,11/30,49/60,31/30,98/60,A,,,,,,,Y
+Matematika,"Harga komik Rp24.000. Buku gambar 1/2 komik, buku tulis 0,75 komik. Setelah diskon 10% harga total adalah...",MC,18000,24000,27000,30000,C,,,,,,,Y
+Matematika,Pak Bondan memproduksi susu kedelai dalam 7 wadah masing-masing 6 1/4 liter.,TF,,,,,,Total produksi sesuai perhitungan,Benar,Isi tiap botol besar sesuai perhitungan,Benar,Total susu botol kecil sesuai perhitungan,Salah,Y
+Matematika,"Pada dadu, jumlah titik pada dua sisi berlawanan sama. Banyak titik pada sisi bawah adalah...",MC,2,3,4,5,B,,,,,,,Y
+Matematika,"Paket sembako berisi 3 kg beras, 2 gula @5 hg, dan 5 mi @85 g.",MCMA,Total berat 4425 g,"Berat mi lebih dari 0,5 kg",Satu gula lebih berat dari semua mi,,"A,C",,,,,,,Y
+Matematika,Data pengunjung perpustakaan selama lima hari.,TF,,,,,,Pengunjung Senin setengah Rabu,Benar,Total pengunjung 100,Salah,Selisih harian ?5,Benar,Y
+Matematika,"Piktogram jumlah buku dibaca Rina, Dika, Siti.",TF,,,,,,Rina membaca 10 buku,Benar,Dika lebih sedikit dari Rina,Benar,Siti membaca 3 buku,Salah,Y
+Matematika,"Lahan 3,5 ha. 1/5 cabai, 1/3 tomat, sisanya daun bawang. Luas tomat + daun bawang...",MC,"1,63","1,87","2,33","2,80",D,,,,,,,Y
+Matematika,Bak kubus volume 9 m3 diubah menjadi balok dengan perubahan ukuran.,MC,"4,5",9,18,"22,5",B,,,,,,,Y
+Matematika,Perjalanan Yogya-Semarang 140 km kecepatan 80 km/jam berhenti 15 menit.,MC,07.45,08.00,08.45,09.00,B,,,,,,,Y
+Matematika,"Ulang tahun Lala 14 Juni, sekarang 30 April.",TF,,,,,,Menunggu 45 hari,Benar,Menunggu 6 minggu 3 hari,Benar,Menunggu dua bulan,Salah,Y
+Matematika,"Ibu membeli 3 kg buah. Alpukat 1,25 kg sisanya 7 mangga.",MC,"0,2","0,25","0,3","0,35",B,,,,,,,Y
+Matematika,"Tangki air 0,8 hektoliter.",TF,,,,,,Volume 80 liter,Benar,Bak 20 liter bisa diisi 5 kali,Salah,10 baris tanaman menghabiskan setengah,Benar,Y
+Matematika,Kotak dapat menampung 64 kubus satuan.,MCMA,8x2x4,4x4x4,4x3x5,,"A,B",,,,,,,Y
+Matematika,Petunjuk arah kebun binatang.,TF,,,,,,Jarak Zebra 6000 mm,Salah,Capybara ke Kanguru 1500 cm,Benar,"Jerapah ke Kanguru 0,11 km",Benar,Y
+Matematika,Batang rotan 320 cm dipotong 15 cm.,MC,4,5,6,7,B,,,,,,,Y
+Matematika,"Jadwal olahraga 2, 3, dan 4 minggu sekali.",MC,4,6,12,18,C,,,,,,,Y
+Matematika,Jika a = 5 ? 7/2 dan b = 3/4 ? 1/2 maka a ? 2b = ...,MC,1,1 1/4,2,2 1/4,A,,,,,,,Y
+Matematika,Bagian kue cokelat dari seluruh kue.,MC,1/8,1/4,1/2,3/4,B,,,,,,,Y
+Matematika,Keliling tanah Pak Boni.,MC,58,68,72,96,B,,,,,,,Y
+Matematika,"Jumlah siswa 28, 36, 32 masing-masing mendapat 3 buku. Dus berisi 24 buku.",MC,8,10,12,24,C,,,,,,,Y
+Matematika,Siapa yang menempuh 3/5 dari 10 km.,MC,Andi,Beni,Citra,Dika,B,,,,,,,Y
+Matematika,Bangun dengan sisi sama panjang dan diagonal tegak lurus.,MC,Persegi,Persegi panjang,Belah ketupat,Layang-layang,C,,,,,,,Y
+Matematika,Rani berangkat 07.25 perjalanan 45 menit latihan 1j35m istirahat 20 menit.,MC,09.45,10.00,10.05,10.25,C,,,,,,,Y
+Matematika,Soal parkir mobil taman kota.,MC,9,10,12,14,B,,,,,,,Y
+Matematika,Kapasitas parkir motor.,TF,,,,,,4 motor keluar sebelum 13.00,Benar,Sebelumnya sudah 8 motor,Salah,Total pukul 13.00 ada 20,Salah,Y
+Matematika,Persen buku dibaca Caca.,MC,34%,50%,66%,75%,D,,,,,,,Y
+Matematika,Jumlah halaman dibaca siswa.,TF,,,,,,Danu membaca 219 halaman,Benar,Antok membaca 170 halaman,Benar,Caca membaca 287 halaman,Salah,Y
+Matematika,Makanan yang memenuhi kebutuhan protein anak.,MCMA,Daging sapi,Telur ayam,Ikan,,"A,C",,,,,,,Y
+Matematika,Kebutuhan protein dan lemak ibu hamil.,TF,,,,,,Tambah 50 g ikan cukup protein,Salah,Tambah 50 g keju cukup lemak,Benar,Tambah 50 g daging sapi cukup protein,Benar,Y
