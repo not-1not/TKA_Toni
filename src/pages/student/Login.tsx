@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { api, Student } from '../../lib/db';
+import { api } from '../../lib/db';
 import { LogIn, BookOpen } from 'lucide-react';
 
 const StudentLogin = () => {
@@ -16,7 +16,7 @@ const StudentLogin = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!username.trim() || !tokenStr.trim() || !selectedSubject) {
       setError('Please fill in all required fields and select a subject!');
       return;
@@ -56,16 +56,16 @@ const StudentLogin = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] animate-fade-in">
       <div className="text-center mb-8">
-        <div className="flex items-center justify-center justify-center mb-4 text-primary">
+        <div className="flex items-center justify-center mb-4 text-primary">
           <BookOpen size={64} />
         </div>
-        <h1 className="text-4xl text-primary drop-shadow-sm">TKA SD Tryout Platform</h1>
+        <h1 className="text-4xl text-primary drop-shadow-sm">TKA SD Negeri 3 Purwosari</h1>
         <p className="text-xl text-muted mt-2">Welcome students! Let's get started.</p>
       </div>
 
       <div className="card w-full max-w-md glass border-2 border-primary/20">
         <h2 className="text-2xl text-center mb-6">Student Login</h2>
-        
+
         {error && (
           <div className="bg-danger/10 border-l-4 border-danger text-danger p-4 mb-6 rounded-r">
             {error}
@@ -75,10 +75,10 @@ const StudentLogin = () => {
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label className="input-label" htmlFor="username">Username / NISN</label>
-            <input 
+            <input
               id="username"
-              type="text" 
-              className="input-field" 
+              type="text"
+              className="input-field"
               placeholder="e.g. 123456789"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -87,10 +87,10 @@ const StudentLogin = () => {
 
           <div className="input-group">
             <label className="input-label" htmlFor="password">Password (Opsional jika tidak disetel)</label>
-            <input 
+            <input
               id="password"
-              type="password" 
-              className="input-field" 
+              type="password"
+              className="input-field"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -99,7 +99,7 @@ const StudentLogin = () => {
 
           <div className="input-group">
             <label className="input-label" htmlFor="subject">Pilih Mata Pelajaran</label>
-            <select 
+            <select
               id="subject"
               className="input-field font-bold text-primary"
               value={selectedSubject}
@@ -114,10 +114,10 @@ const StudentLogin = () => {
 
           <div className="input-group">
             <label className="input-label" htmlFor="token">Exam Token</label>
-            <input 
+            <input
               id="token"
-              type="text" 
-              className="input-field text-center tracking-widest uppercase font-bold text-xl" 
+              type="text"
+              className="input-field text-center tracking-widest uppercase font-bold text-xl"
               placeholder="e.g. TRYOUT123"
               value={tokenStr}
               onChange={(e) => setTokenStr(e.target.value)}
@@ -130,13 +130,14 @@ const StudentLogin = () => {
         </form>
 
         <div className="text-center mt-6">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="text-muted text-sm hover:text-primary underline bg-transparent border-none cursor-pointer"
             onClick={() => navigate('/admin/login')}
           >
             Teacher/Admin Login
           </button>
+          <p className="text-muted text-xs mt-3">app by Toni Adhi Putranto</p>
         </div>
       </div>
     </div>
