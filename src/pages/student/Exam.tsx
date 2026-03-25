@@ -5,6 +5,14 @@ import { api, ExamToken, Question, ExamState } from '../../lib/db';
 import { formatTime, getServerTime } from '../../lib/utils';
 import { User, Building, AlertTriangle, Type, Plus, Minus, Menu, X } from 'lucide-react';
 
+// Renders HTML content safely for question text and options
+const RichText = ({ html, className = '' }: { html: string; className?: string }) => (
+  <div
+    className={`rich-content ${className}`}
+    dangerouslySetInnerHTML={{ __html: html }}
+  />
+);
+
 const Exam = () => {
   const { auth } = useAuth();
   const navigate = useNavigate();
@@ -199,7 +207,7 @@ const Exam = () => {
                   {isSelected && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-sm" />}
                 </div>
                 <div className="flex-1 font-medium text-base sm:text-lg leading-snug">
-                  {s.text}
+                  <RichText html={s.text} />
                 </div>
               </button>
             );
@@ -225,7 +233,9 @@ const Exam = () => {
 
             return (
               <div key={i} className="bg-neutral-50 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-neutral-200">
-                <div className="text-base sm:text-lg font-bold text-neutral-800 mb-3 sm:mb-4">{i + 1}. {s.text}</div>
+                <div className="text-base sm:text-lg font-bold text-neutral-800 mb-3 sm:mb-4">
+                  {i + 1}. <RichText html={s.text} className="inline" />
+                </div>
                 <div className="flex gap-2 sm:gap-4">
                   {pair.map(opt => (
                     <button
@@ -343,9 +353,9 @@ const Exam = () => {
 
             <div
               ref={questionRef}
-              className="mb-4 sm:mb-6 leading-relaxed font-medium text-neutral-800 whitespace-pre-wrap"
+              className="mb-4 sm:mb-6 leading-relaxed font-medium text-neutral-800"
             >
-              {currentQ.question}
+              <RichText html={currentQ.question} />
             </div>
 
             {currentQ.image && (
