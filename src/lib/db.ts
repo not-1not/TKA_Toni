@@ -220,8 +220,17 @@ export const api = {
       }
     }
 
-    const { error } = await supabase.from('questions').insert([payload]);
-    if (error) throw new Error(`Failed to add question: ${error.message}`);
+    let result = await supabase.from('questions').insert([payload]);
+    if (result.error) {
+      const message = result.error.message || '';
+      if (message.toLowerCase().includes("could not find the 'package' column")) {
+        delete payload.package;
+        result = await supabase.from('questions').insert([payload]);
+        if (result.error) throw new Error(`Failed to add question (fallback): ${result.error.message}`);
+        return;
+      }
+      throw new Error(`Failed to add question: ${message}`);
+    }
   },
   updateQuestion: async (q: Question) => {
     const payload: any = {
@@ -245,7 +254,16 @@ export const api = {
     }
 
     const { error } = await supabase.from('questions').update(payload).eq('id', q.id);
-    if (error) throw new Error(`Failed to update question: ${error.message}`);
+    if (error) {
+      const message = error.message || '';
+      if (message.toLowerCase().includes("could not find the 'package' column")) {
+        delete payload.package;
+        const { error: fallbackError } = await supabase.from('questions').update(payload).eq('id', q.id);
+        if (fallbackError) throw new Error(`Failed to update question (fallback): ${fallbackError.message}`);
+        return;
+      }
+      throw new Error(`Failed to update question: ${message}`);
+    }
   },
   deleteQuestion: async (id: string) => {
     const { error } = await supabase.from('questions').delete().eq('id', id);
@@ -278,8 +296,21 @@ export const api = {
       }
       return payload;
     });
-    const { error } = await supabase.from('questions').upsert(payloads);
-    if (error) throw new Error(`Failed to save questions: ${error.message}`);
+    let upsertResult = await supabase.from('questions').upsert(payloads);
+    if (upsertResult.error) {
+      const message = upsertResult.error.message || '';
+      if (message.toLowerCase().includes("could not find the 'package' column")) {
+        const cleanPayloads = payloads.map(p => {
+          const cp = { ...p };
+          delete cp.package;
+          return cp;
+        });
+        upsertResult = await supabase.from('questions').upsert(cleanPayloads);
+        if (upsertResult.error) throw new Error(`Failed to save questions (fallback): ${upsertResult.error.message}`);
+        return;
+      }
+      throw new Error(`Failed to save questions: ${message}`);
+    }
   },
 
   // --- Results ---

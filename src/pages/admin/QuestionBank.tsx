@@ -357,18 +357,23 @@ const QuestionBank = () => {
     setIsLoading(true);
     try {
       const selectedQs = questions.filter(q => selectedIds.includes(q.id));
-      // Update each question individually using updateQuestion
       const updatePromises = selectedQs.map(q =>
         api.updateQuestion({ ...q, package: targetPackage })
       );
       await Promise.all(updatePromises);
-      // Refresh all questions from database
       await fetchQuestions();
       setSelectedIds([]);
       alert("Questions moved successfully");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to move questions:", err);
-      alert("Failed to move questions");
+      const message = err?.message || err?.toString() || '';
+      if (message.toLowerCase().includes("could not find the 'package' column")) {
+        setQuestions(prev => prev.map(q => selectedIds.includes(q.id) ? { ...q, package: targetPackage } : q));
+        setSelectedIds([]);
+        alert('Package column tidak tersedia, perubahan disimpan lokal saja.');
+      } else {
+        alert("Failed to move questions");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -397,7 +402,13 @@ const QuestionBank = () => {
       alert('Question package updated successfully');
     } catch (err: any) {
       console.error('Failed to update question package:', err);
-      alert(`Failed to update question package: ${err?.message || err}`);
+      const message = err?.message || err?.toString() || '';
+      if (message.toLowerCase().includes("could not find the 'package' column")) {
+        setQuestions(prev => prev.map(item => item.id === q.id ? { ...item, package: value } : item));
+        alert('Package column tidak tersedia, perubahan disimpan lokal saja.');
+      } else {
+        alert(`Failed to update question package: ${message}`);
+      }
     } finally {
       setIsLoading(false);
     }
