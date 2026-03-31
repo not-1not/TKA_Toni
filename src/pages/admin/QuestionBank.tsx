@@ -504,6 +504,47 @@ const QuestionBank = () => {
     alert(`Downloaded ${filteredQuestions.length} questions as ${filename}`);
   };
 
+  const handleDownloadCSV = () => {
+    if (filteredQuestions.length === 0) {
+      alert('No questions to download. Apply filters first.');
+      return;
+    }
+
+    const csvHeaders = ['ID', 'Package', 'Subject', 'Type', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Answer', 'Statements', 'Image'];
+    const csvRows = filteredQuestions.map(q => {
+      const statements = q.statements?.map(s => `${s.text}|${s.isCorrect ? 'TRUE' : 'FALSE'}|${s.correctAnswer || ''}`).join(';') || '';
+      const row = [
+        q.id,
+        q.package || '',
+        q.subject || '',
+        q.type || '',
+        `"${(q.question || '').replace(/"/g, '""')}"`,
+        q.option_a || '',
+        q.option_b || '',
+        q.option_c || '',
+        q.option_d || '',
+        q.correct_answer || '',
+        `"${statements}"`,
+        q.image || ''
+      ];
+      return row.map(cell => 
+        typeof cell === 'string' && cell.includes(',') ? `"${cell.replace(/"/g, '""')}"` : cell
+      ).join(',');
+    });
+
+    const content = [csvHeaders.join(','), ...csvRows].join('\n');
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(content));
+    const filename = `questions_${new Date().toISOString().split('T')[0]}.csv`;
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+
+    alert(`Downloaded ${filteredQuestions.length} questions as ${filename}`);
+  };
+
   const packageStats = allUniquePackages.map(p => ({
     name: p,
     count: questions.filter(q => q.package === p).length
@@ -525,9 +566,18 @@ const QuestionBank = () => {
           <button 
             onClick={handleDownloadPackage}
             disabled={filteredQuestions.length === 0}
-            className="btn btn-outline border-secondary text-secondary hover:bg-secondary/5 shadow-sm flex-1 md:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn btn-outline border-secondary text-secondary hover:bg-secondary/5 shadow-sm flex-1 md:flex-none disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            title="Download as text format (for re-import)"
           >
-            <Upload size={20} className="rotate-180" /> Download
+            <Upload size={20} className="rotate-180" /> TXT
+          </button>
+          <button 
+            onClick={handleDownloadCSV}
+            disabled={filteredQuestions.length === 0}
+            className="btn btn-outline border-accent text-accent hover:bg-accent/5 shadow-sm flex-1 md:flex-none disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            title="Download as CSV (for Excel/Sheets)"
+          >
+            <Upload size={20} className="rotate-180" /> CSV
           </button>
           <button
             onClick={() => {

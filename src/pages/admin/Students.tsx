@@ -45,6 +45,36 @@ const Students = () => {
       s.username.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const handleDownloadCSV = () => {
+    if (filteredStudents.length === 0) {
+      alert('No students to download. Apply filters first.');
+      return;
+    }
+
+    const csvHeaders = ['ID', 'Username', 'Name', 'School', 'Password'];
+    const csvRows = filteredStudents.map(s => [
+      s.id || '',
+      s.username || '',
+      `"${(s.name || '').replace(/"/g, '""')}"`,
+      s.school || '',
+      s.password || ''
+    ].map(cell => 
+      typeof cell === 'string' && cell.includes(',') && !cell.startsWith('"') ? `"${cell.replace(/"/g, '""')}"` : cell
+    ).join(','));
+
+    const content = [csvHeaders.join(','), ...csvRows].join('\n');
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(content));
+    const filename = `students_${new Date().toISOString().split('T')[0]}.csv`;
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+
+    alert(`Downloaded ${filteredStudents.length} students as ${filename}`);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.username || !formData.name || !formData.school) {
@@ -206,6 +236,14 @@ const Students = () => {
         <div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
           <button onClick={() => setShowBulkAdd(true)} className="btn btn-outline border-secondary text-secondary hover:bg-secondary/5 shadow-sm flex-1 md:flex-none">
             <Upload size={20} /> Bulk Add
+          </button>
+          <button 
+            onClick={handleDownloadCSV}
+            disabled={filteredStudents.length === 0}
+            className="btn btn-outline border-accent text-accent hover:bg-accent/5 shadow-sm flex-1 md:flex-none disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+            title="Download students as CSV"
+          >
+            <Upload size={20} className="rotate-180" /> CSV
           </button>
           <button onClick={() => setShowForm(true)} className="btn btn-primary shadow-lg flex-1 md:flex-none">
             <Plus size={20} /> Add Student
