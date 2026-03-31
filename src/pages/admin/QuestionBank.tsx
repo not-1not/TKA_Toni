@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminLayout } from './Dashboard';
 import { api, Question, Statement } from '../../lib/db';
-import { Plus, Trash2, Edit3, X, CheckSquare, Square, Filter, Layers, Copy, Move, Search, Upload, FileQuestion } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, CheckSquare, Square, Filter, Layers, Copy, Move, Search, Upload, FileQuestion, ChevronsUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
 const QuestionBank = () => {
@@ -42,6 +42,11 @@ const QuestionBank = () => {
   const [tempPackages, setTempPackages] = useState<string[]>([]);
   const [tempSubjects, setTempSubjects] = useState<string[]>([]);
   const [newPackageName, setNewPackageName] = useState('');
+  const [tableSortField, setTableSortField] = useState<'package'|'subject'|'question'|'type'|'none'>('none');
+  const [tableSortDir, setTableSortDir] = useState<'asc'|'desc'>('asc');
+  const [headerPackageFilter, setHeaderPackageFilter] = useState('All');
+  const [headerSubjectFilter, setHeaderSubjectFilter] = useState('All');
+  const [headerQuestionSearch, setHeaderQuestionSearch] = useState('');
 
   const fetchQuestions = async () => {
     setIsLoading(true);
@@ -63,20 +68,40 @@ const QuestionBank = () => {
     fetchQuestions();
   }, []);
 
+  const effectiveSubjectFilter = headerSubjectFilter !== 'All' ? headerSubjectFilter : filterSubject;
+  const effectivePackageFilter = headerPackageFilter !== 'All' ? headerPackageFilter : filterPackage;
+  const effectiveSearch = (searchTerm || headerQuestionSearch).trim().toLowerCase();
+  const effectiveSort = tableSortField !== 'none' ? tableSortField : sortBy;
+
   const filteredQuestions = questions
-    .filter(q => (filterSubject === 'All' || q.subject === filterSubject))
-    .filter(q => (filterPackage === 'All' || q.package === filterPackage))
-    .filter(q => (searchTerm === '' ||
-      q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (q.package || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.subject.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(q => (effectiveSubjectFilter === 'All' || q.subject === effectiveSubjectFilter))
+    .filter(q => (effectivePackageFilter === 'All' || q.package === effectivePackageFilter))
+    .filter(q => (effectiveSearch === '' ||
+      q.question.toLowerCase().includes(effectiveSearch) ||
+      (q.package || '').toLowerCase().includes(effectiveSearch) ||
+      q.subject.toLowerCase().includes(effectiveSearch)
     ))
     .sort((a, b) => {
-      if (sortBy === 'subject') return (a.subject || '').localeCompare(b.subject || '');
-      if (sortBy === 'package') return (a.package || '').localeCompare(b.package || '');
-      if (sortBy === 'question') return (a.question || '').localeCompare(b.question || '');
-      return 0;
+      const wipe = (v?: string) => (v || '').toLowerCase();
+      let cmp = 0;
+      if (effectiveSort === 'subject') cmp = wipe(a.subject).localeCompare(wipe(b.subject));
+      else if (effectiveSort === 'package') cmp = wipe(a.package).localeCompare(wipe(b.package));
+      else if (effectiveSort === 'question') cmp = wipe(a.question).localeCompare(wipe(b.question));
+      else if (effectiveSort === 'type') cmp = wipe(a.type).localeCompare(wipe(b.type));
+      if (tableSortField !== 'none') {
+        return tableSortDir === 'desc' ? -cmp : cmp;
+      }
+      return cmp;
     });
+
+  const toggleTableSort = (field: 'package'|'subject'|'question'|'type') => {
+    if (tableSortField === field) {
+      setTableSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setTableSortField(field);
+      setTableSortDir('asc');
+    }
+  };
 
   const handleReorder = async (newOrder: Question[]) => {
     if (filterSubject !== 'All' || filterPackage !== 'All' || sortBy !== 'none') return; // Reorder only in default view
@@ -363,6 +388,8 @@ const QuestionBank = () => {
       await Promise.all(updatePromises);
       await fetchQuestions();
       setSelectedIds([]);
+      setFilterPackage(targetPackage);
+      setHeaderPackageFilter(targetPackage);
       alert("Questions moved successfully");
     } catch (err: any) {
       console.error("Failed to move questions:", err);
@@ -820,11 +847,52 @@ const QuestionBank = () => {
                   </button>
                 </th>
                 <th className="p-4 w-16 text-center">No</th>
-                <th className="p-4 w-32">Package</th>
-                <th className="p-4 w-32">Subject</th>
-                <th className="p-4">Question</th>
-                <th className="p-4 w-32">Type</th>
+                <th className="p-4 w-32 cursor-pointer" onClick={() => toggleTableSort('package')}>
+                  Package
+                  <span className="ml-1 align-middle">
+                    {tableSortField === 'package' ? (tableSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ChevronsUpDown size={12} />}
+                  </span>
+                </th>
+                <th className="p-4 w-32 cursor-pointer" onClick={() => toggleTableSort('subject')}>
+                  Subject
+                  <span className="ml-1 align-middle">
+                    {tableSortField === 'subject' ? (tableSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ChevronsUpDown size={12} />}
+                  </span>
+                </th>
+                <th className="p-4 cursor-pointer" onClick={() => toggleTableSort('question')}>
+                  Question
+                  <span className="ml-1 align-middle">
+                    {tableSortField === 'question' ? (tableSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ChevronsUpDown size={12} />}
+                  </span>
+                </th>
+                <th className="p-4 w-32 cursor-pointer" onClick={() => toggleTableSort('type')}>
+                  Type
+                  <span className="ml-1 align-middle">
+                    {tableSortField === 'type' ? (tableSortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ChevronsUpDown size={12} />}
+                  </span>
+                </th>
                 <th className="p-4 w-32 text-right">Actions</th>
+              </tr>
+              <tr className="bg-background text-text-muted text-[11px]">
+                <th></th>
+                <th></th>
+                <th className="p-2">
+                  <select value={headerPackageFilter} onChange={e => setHeaderPackageFilter(e.target.value)} className="input-field w-full text-xs"> 
+                    <option value="All">All</option>
+                    {allUniquePackages.map(pkg => <option key={pkg} value={pkg}>{pkg}</option>)}
+                  </select>
+                </th>
+                <th className="p-2">
+                  <select value={headerSubjectFilter} onChange={e => setHeaderSubjectFilter(e.target.value)} className="input-field w-full text-xs">
+                    <option value="All">All</option>
+                    {allUniqueSubjects.map(subj => <option key={subj} value={subj}>{subj}</option>)}
+                  </select>
+                </th>
+                <th className="p-2">
+                  <input type="text" value={headerQuestionSearch} onChange={e => setHeaderQuestionSearch(e.target.value)} placeholder="Search question..." className="input-field w-full text-xs" />
+                </th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
