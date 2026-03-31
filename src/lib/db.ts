@@ -202,11 +202,11 @@ export const api = {
     const payload: any = {
       id: q.id,
       subject: q.subject,
-      'package': q.package || '',
       question: q.question,
       type: q.type === 'pilihan_ganda' ? 'MC' : q.type === 'pilihan_ganda_kompleks' ? 'MCMA' : 'TF',
       image: q.image || ''
     };
+    if (q.package) payload.package = q.package;
 
     if (q.type === 'pilihan_ganda') {
       payload.options = [q.option_a, q.option_b, q.option_c, q.option_d];
@@ -226,11 +226,11 @@ export const api = {
   updateQuestion: async (q: Question) => {
     const payload: any = {
       subject: q.subject,
-      'package': q.package || '',
       question: q.question,
       type: q.type === 'pilihan_ganda' ? 'MC' : q.type === 'pilihan_ganda_kompleks' ? 'MCMA' : 'TF',
       image: q.image || ''
     };
+    if (q.package) payload.package = q.package;
 
     if (q.type === 'pilihan_ganda') {
       payload.options = [q.option_a, q.option_b, q.option_c, q.option_d];
@@ -260,11 +260,11 @@ export const api = {
       const payload: any = {
         id: q.id,
         subject: q.subject,
-        'package': q.package || '',
         question: q.question,
         type: q.type === 'pilihan_ganda' ? 'MC' : q.type === 'pilihan_ganda_kompleks' ? 'MCMA' : 'TF',
         image: q.image || ''
       };
+      if (q.package) payload.package = q.package;
       if (q.type === 'pilihan_ganda') {
         payload.options = [q.option_a, q.option_b, q.option_c, q.option_d];
         payload.answer = q.correct_answer;
