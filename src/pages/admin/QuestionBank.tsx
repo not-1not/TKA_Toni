@@ -206,16 +206,16 @@ const QuestionBank = () => {
     try {
       const lines = bulkText.split('\n').filter(l => l.trim());
       const newQuestions: Question[] = lines.map(line => {
-        const parts = line.split(/[\t|]/).map(p => p.trim());
-        // Format: Package | Subject | Question | Type | OptionA | OptionB | OptionC | OptionD | Answer
+        const parts = line.split(/[\t|,]/).map(p => p.trim().replace(/^"|"$/g, ''));
+        // Format: package | subject | question | type | option_a | option_b | option_c | option_d | correct_answer | s1_text | s1_answer | s2_text | s2_answer | s3_text | s3_answer | image
         const pkg = parts[0] || 'Default';
         const subj = parts[1] || 'Umum';
         const qText = parts[2] || '';
         const typeRaw = (parts[3] || 'PG').toUpperCase();
 
         let type: any = 'pilihan_ganda';
-        if (typeRaw === 'PK' || typeRaw === 'KOMPLEKS') type = 'pilihan_ganda_kompleks';
-        if (typeRaw === 'MCMA' || typeRaw === 'TF') type = 'multiple_choice_multiple_answer';
+        if (typeRaw === 'PK' || typeRaw === 'KOMPLEKS' || typeRaw === 'PILIHAN_GANDA_KOMPLEKS') type = 'pilihan_ganda_kompleks';
+        if (typeRaw === 'MCMA' || typeRaw === 'TF' || typeRaw === 'MULTIPLE_CHOICE_MULTIPLE_ANSWER') type = 'multiple_choice_multiple_answer';
 
         const q: Question = {
           id: 'Q-' + Math.random().toString(36).substring(2, 9),
@@ -223,7 +223,7 @@ const QuestionBank = () => {
           subject: subj,
           question: qText,
           type: type,
-          image: ''
+          image: parts[15] || ''
         };
 
         if (type === 'pilihan_ganda') {
@@ -233,27 +233,24 @@ const QuestionBank = () => {
           q.option_d = parts[7] || '';
           q.correct_answer = (parts[8] || 'A') as any;
         } else {
-          // For PK/MCMA, we expect simpler parsing
-          // PK format: <package>|<subject>|<question>|PK|<stmt1>|<stmt2>|<stmt3>|<unused>|<correct letters>
-          // MCMA format: <package>|<subject>|<question>|MCMA|<stmt1>|<stmt2>|<stmt3>|<unused>|<S/T/S> (e.g. "S,T,S")
-          const stmt1 = parts[4] || '';
-          const stmt2 = parts[5] || '';
-          const stmt3 = parts[6] || '';
-          const answer = (parts[8] || '').trim();
+          const s1_text = parts[9] || '';
+          const s1_ans = (parts[10] || '').toUpperCase();
+          const s2_text = parts[11] || '';
+          const s2_ans = (parts[12] || '').toUpperCase();
+          const s3_text = parts[13] || '';
+          const s3_ans = (parts[14] || '').toUpperCase();
 
           if (type === 'pilihan_ganda_kompleks') {
-            const selected = answer.toUpperCase().split(/[,;\s]+/).filter(Boolean);
             q.statements = [
-              { text: stmt1, isCorrect: selected.includes('A') },
-              { text: stmt2, isCorrect: selected.includes('B') },
-              { text: stmt3, isCorrect: selected.includes('C') },
+              { text: s1_text, isCorrect: s1_ans === 'TRUE' || s1_ans === 'A' || s1_ans === '1' },
+              { text: s2_text, isCorrect: s2_ans === 'TRUE' || s2_ans === 'B' || s2_ans === '1' },
+              { text: s3_text, isCorrect: s3_ans === 'TRUE' || s3_ans === 'C' || s3_ans === '1' },
             ];
-          } else {
-            const answerFlags = answer.split(/[,;\s]+/).map(a => (a||'Sesuai').trim() || 'Sesuai');
+          } else if (type === 'multiple_choice_multiple_answer') {
             q.statements = [
-              { text: stmt1, correctAnswer: answerFlags[0] || 'Sesuai' },
-              { text: stmt2, correctAnswer: answerFlags[1] || 'Sesuai' },
-              { text: stmt3, correctAnswer: answerFlags[2] || 'Sesuai' },
+              { text: s1_text, correctAnswer: s1_ans === 'TRUE' || s1_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' },
+              { text: s2_text, correctAnswer: s2_ans === 'TRUE' || s2_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' },
+              { text: s3_text, correctAnswer: s3_ans === 'TRUE' || s3_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' },
             ];
           }
         }
@@ -510,25 +507,28 @@ const QuestionBank = () => {
       return;
     }
 
-    const csvHeaders = ['ID', 'Package', 'Subject', 'Type', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Answer', 'Statements', 'Image'];
+    const csvHeaders = ['package', 'subject', 'question', 'type', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_answer', 's1_text', 's1_answer', 's2_text', 's2_answer', 's3_text', 's3_answer', 'image'];
     const csvRows = filteredQuestions.map(q => {
-      const statements = q.statements?.map(s => `${s.text}|${s.isCorrect ? 'TRUE' : 'FALSE'}|${s.correctAnswer || ''}`).join(';') || '';
       const row = [
-        q.id,
         q.package || '',
         q.subject || '',
-        q.type || '',
         `"${(q.question || '').replace(/"/g, '""')}"`,
+        q.type || '',
         q.option_a || '',
         q.option_b || '',
         q.option_c || '',
         q.option_d || '',
         q.correct_answer || '',
-        `"${statements}"`,
+        (q.statements?.[0]?.text || '').replace(/"/g, '""'),
+        q.statements?.[0]?.correctAnswer || q.statements?.[0]?.isCorrect ? 'TRUE' : '',
+        (q.statements?.[1]?.text || '').replace(/"/g, '""'),
+        q.statements?.[1]?.correctAnswer || q.statements?.[1]?.isCorrect ? 'TRUE' : '',
+        (q.statements?.[2]?.text || '').replace(/"/g, '""'),
+        q.statements?.[2]?.correctAnswer || q.statements?.[2]?.isCorrect ? 'TRUE' : '',
         q.image || ''
       ];
       return row.map(cell => 
-        typeof cell === 'string' && cell.includes(',') ? `"${cell.replace(/"/g, '""')}"` : cell
+        typeof cell === 'string' && (cell.includes(',') || cell.includes('"')) ? `"${cell.replace(/"/g, '""')}"` : cell
       ).join(',');
     });
 
@@ -1116,18 +1116,20 @@ const QuestionBank = () => {
               <Upload className="text-primary" /> Bulk Import Questions
             </h2>
             <p className="text-sm text-text-muted mb-4 font-bold">
-              Paste from Excel/Sheets. Use Tab or Pipe (|) as separator.&#10;
-              <span className="block mt-2 text-primary bg-primary/10 p-2 rounded">
-                Format: <strong>Package | Subject | Question | Type (PG/PK/MCMA) | Stmt/OptA | Stmt/OptB | Stmt/OptC | OptD | Answer</strong>
+              Paste from Excel/Sheets. Use Tab, Pipe (|), or Comma as separator.&#10;
+              <span className="block mt-2 text-primary bg-primary/10 p-2 rounded text-xs font-mono">
+                <strong>Format:</strong> package | subject | question | type | option_a | option_b | option_c | option_d | correct_answer | s1_text | s1_answer | s2_text | s2_answer | s3_text | s3_answer | image
               </span>
-              <span className="block text-xs mt-2">Examples:</span>
-              <span className="block text-xs text-text-muted font-mono">PG: Paket A | Math | 1+1? | PG | 1 | 2 | 3 | 4 | B</span>
-              <span className="block text-xs text-text-muted font-mono">PK: Paket A | Bio | Tumbuhan? | PK | Akar | Batang | Daun | - | A,B</span>
-              <span className="block text-xs text-text-muted font-mono">MCMA: Paket A | IPA | Energi? | MCMA | Panas | Cahaya | Gerak | - | S,T,S</span>
+              <span className="block text-xs mt-2 text-text-muted">
+                <strong>Columns 0-3:</strong> Required (package, subject, question, type)<br/>
+                <strong>Columns 4-8:</strong> For PG only (leave empty for PK/MCMA)<br/>
+                <strong>Columns 9-15:</strong> For PK/MCMA only (leave empty for PG)<br/>
+                <strong>Column 15:</strong> Image URL (optional)
+              </span>
             </p>
             <textarea
               className="input-field h-80 font-mono text-xs mb-6"
-              placeholder="Paket A | Math | What is 1+1? | PG | 1 | 2 | 3 | 4 | B&#10;Paket A | Bio | Plant parts? | PK | Root | Stem | Leaf | - | A,B&#10;Paket A | Science | Energy types? | MCMA | Heat | Light | Motion | - | S,T,S"
+              placeholder="PG|Math|1+1?|PG|1|2|3|4|B||||||||&#10;PK|Bio|Plant?|PK||||||Stem|||Root||Leaf||&#10;MCMA|IPA|Energy?|MCMA||||||Heat|S|Light|T|Motion|S|"
               value={bulkText}
               onChange={e => setBulkText(e.target.value)}
               title="Paste your questions here"
