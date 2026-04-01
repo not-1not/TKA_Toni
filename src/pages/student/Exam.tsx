@@ -244,17 +244,20 @@ const Exam = () => {
 
     if (currentQ.type === 'pilihan_ganda_kompleks') {
       const selectedIndices = (selectedAns as number[]) || [];
+      const shuffledIndices = (examState.optionOrder[currentQ.id] || Array.from({length: currentQ.statements?.length || 0}, (_, i) => i)) as number[];
+      const shuffledStatements = shuffledIndices.map(i => ({ stmt: currentQ.statements?.[i], origIndex: i })).filter(s => s.stmt);
+      
       return (
         <div className="space-y-3 sm:space-y-4 max-w-4xl">
           <p className="text-xs sm:text-sm font-bold text-blue-600 bg-blue-50 p-2 rounded inline-block mb-2">
             Pilihlah {currentQ.statements?.filter(s => s.isCorrect).length || 0} pernyataan yang benar
           </p>
-          {currentQ.statements?.map((s, i) => {
-            const isSelected = selectedIndices.includes(i);
+          {shuffledStatements.map(({ stmt, origIndex }, displayIndex) => {
+            const isSelected = selectedIndices.includes(origIndex);
             return (
               <button
-                key={i}
-                onClick={() => handleComplexToggle(i)}
+                key={origIndex}
+                onClick={() => handleComplexToggle(origIndex)}
                 className={`w-full flex items-start text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 group ${isSelected
                   ? 'border-blue-500 bg-blue-50/50 shadow-sm'
                   : 'border-neutral-200 hover:border-blue-300 hover:bg-neutral-50'
@@ -265,7 +268,7 @@ const Exam = () => {
                   {isSelected && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-sm" />}
                 </div>
                 <div className="flex-1 font-medium text-base sm:text-lg leading-snug">
-                  <RichText html={s.text} />
+                  <RichText html={stmt?.text || ''} />
                 </div>
               </button>
             );
@@ -276,9 +279,12 @@ const Exam = () => {
 
     if (currentQ.type === 'multiple_choice_multiple_answer') {
       const statementAnswers = (selectedAns as Record<number, string>) || {};
+      const shuffledIndices = (examState.optionOrder[currentQ.id] || Array.from({length: currentQ.statements?.length || 0}, (_, i) => i)) as number[];
+      const shuffledStatements = shuffledIndices.map(i => ({ stmt: currentQ.statements?.[i], origIndex: i })).filter(s => s.stmt);
+      
       return (
         <div className="space-y-4 sm:space-y-6 max-w-5xl">
-          {currentQ.statements?.map((s, i) => {
+          {shuffledStatements.map(({ stmt, origIndex }, displayIndex) => {
             const getPair = (ans: string) => {
               if (ans === 'Benar' || ans === 'Salah') return ['Benar', 'Salah'];
               if (ans === 'Sesuai' || ans === 'Tidak Sesuai') return ['Sesuai', 'Tidak Sesuai'];
@@ -287,19 +293,19 @@ const Exam = () => {
               if (ans === 'Mendukung' || ans === 'Tidak Mendukung') return ['Mendukung', 'Tidak Mendukung'];
               return ['Sesuai', 'Tidak Sesuai'];
             };
-            const pair = getPair(s.correctAnswer || '');
+            const pair = getPair(stmt?.correctAnswer || '');
 
             return (
-              <div key={i} className="bg-neutral-50 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-neutral-200">
+              <div key={origIndex} className="bg-neutral-50 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-neutral-200">
                 <div className="text-base sm:text-lg font-bold text-neutral-800 mb-3 sm:mb-4">
-                  {i + 1}. <RichText html={s.text} className="inline" />
+                  {displayIndex + 1}. <RichText html={stmt?.text || ''} className="inline" />
                 </div>
                 <div className="flex gap-2 sm:gap-4">
                   {pair.map(opt => (
                     <button
                       key={opt}
-                      onClick={() => handleStatementCheck(i, opt)}
-                      className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-xl font-bold border-2 transition-all text-sm sm:text-base ${statementAnswers[i] === opt
+                      onClick={() => handleStatementCheck(origIndex, opt)}
+                      className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-xl font-bold border-2 transition-all text-sm sm:text-base ${statementAnswers[origIndex] === opt
                         ? 'bg-blue-600 border-blue-600 text-white shadow-md'
                         : 'bg-white border-neutral-200 text-neutral-600 hover:border-blue-300'
                         }`}

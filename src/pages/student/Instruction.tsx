@@ -52,9 +52,17 @@ const Instruction = () => {
 
         const shuffled = shuffleArray([...filteredByPackage]).slice(0, tokenInfo.questionCount);
         const questionOrder = shuffled.map(q => q.id);
-        const optionOrder: Record<string, ('A'|'B'|'C'|'D')[]> = {};
+        const optionOrder: Record<string, any> = {};
         shuffled.forEach(q => {
-          optionOrder[q.id] = shuffleArray(['A', 'B', 'C', 'D']);
+          if (q.type === 'pilihan_ganda') {
+            // For PG: shuffle option letters A, B, C, D
+            optionOrder[q.id] = shuffleArray(['A', 'B', 'C', 'D']);
+          } else {
+            // For PK/MCMA: shuffle statement indices
+            const statementCount = q.statements?.length || 0;
+            const shuffledIndices = shuffleArray(Array.from({length: statementCount}, (_, i) => i));
+            optionOrder[q.id] = shuffledIndices;
+          }
         });
         
         await api.setExamState({
