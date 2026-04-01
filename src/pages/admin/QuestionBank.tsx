@@ -531,10 +531,10 @@ const QuestionBank = () => {
           q.correct_answer || 'A'
         );
       } else {
-        // For PK and MCMA: add 3 statements
+        // For PK and MCMA: add 3 statements (ensure all 3 even if some are empty)
         for (let i = 0; i < 3; i++) {
           const stmt = q.statements?.[i];
-          if (stmt) {
+          if (stmt && stmt.text) {
             row.push(stmt.text || '');
             if (q.type === 'pilihan_ganda_kompleks') {
               row.push(stmt.isCorrect ? 'TRUE' : 'FALSE');
@@ -542,7 +542,9 @@ const QuestionBank = () => {
               row.push(stmt.correctAnswer || 'Tidak Sesuai');
             }
           } else {
-            row.push('', q.type === 'pilihan_ganda_kompleks' ? 'FALSE' : 'Tidak Sesuai');
+            // Empty statement slot
+            row.push('');
+            row.push(q.type === 'pilihan_ganda_kompleks' ? 'FALSE' : 'Tidak Sesuai');
           }
         }
       }

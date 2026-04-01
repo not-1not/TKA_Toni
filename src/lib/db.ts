@@ -110,17 +110,30 @@ const mapQuestionFromDb = (q: any): Question => {
     res.option_d = optionsArray[3] || '';
     res.correct_answer = (q.answer || 'A') as any;
   } else if (qType === 'pilihan_ganda_kompleks') {
+    // For PK: answer is like "A,C" or "A, C" (letters of correct statements)
     const correctAnswers = (q.answer || '').toUpperCase().split(',').map((s: string) => s.trim());
     res.statements = optionsArray.map((opt: any, idx: number) => {
       const letter = String.fromCharCode(65 + idx);
-      return { text: typeof opt === 'string' ? opt : (opt.statement || ''), isCorrect: correctAnswers.includes(letter) };
+      const text = typeof opt === 'string' ? opt : (opt?.statement || '');
+      const isCorrect = correctAnswers.includes(letter);
+      return { text, isCorrect };
     });
   } else if (qType === 'multiple_choice_multiple_answer') {
-    const answerArray = (q.answer || '').split(',').map((a: string) => a.trim() || 'Sesuai');
+    // For MCMA: answer is like "Sesuai,Tidak Sesuai,Sesuai" 
+    const answerArray = (q.answer || '')
+      .split(',')
+      .map((a: string) => a.trim())
+      .filter(a => a); // Remove empty strings
+    
+    // Pad with defaults if needed
+    while (answerArray.length < optionsArray.length) {
+      answerArray.push('Sesuai');
+    }
+    
     res.statements = optionsArray.map((opt: any, idx: number) => {
-      const statementText = typeof opt === 'string' ? opt : (opt?.statement || '');
+      const text = typeof opt === 'string' ? opt : (opt?.statement || '');
       const correctAnswer = answerArray[idx] || 'Sesuai';
-      return { text: statementText, correctAnswer };
+      return { text, correctAnswer };
     });
   }
   return res;
@@ -464,9 +477,8 @@ export const api = {
           q.option_c = cols[6]?.trim() || '';
           q.option_d = cols[7]?.trim() || '';
           q.correct_answer = (cols[8]?.trim() || 'A').toUpperCase() as any;
-        } else if (qType === 'pilihan_ganda_kompleks') {
-          // PK: s1_text(9), s1_answer(10), s2_text(11), s2_answer(12), s3_text(13), s3_answer(14)
-          const statements: Statement[] = [];
+        } else {
+          // PK and MCMA both use: s1_text(9), s1_answer(10), s2_text(11), s2_answer(12), s3_text(13), s3_answer(14)
           const s1_text = cols[9]?.trim();
           const s1_ans = cols[10]?.trim()?.toUpperCase();
           const s2_text = cols[11]?.trim();
@@ -474,25 +486,21 @@ export const api = {
           const s3_text = cols[13]?.trim();
           const s3_ans = cols[14]?.trim()?.toUpperCase();
 
-          if (s1_text) statements.push({ text: s1_text, isCorrect: s1_ans === 'TRUE' || s1_ans === '1' });
-          if (s2_text) statements.push({ text: s2_text, isCorrect: s2_ans === 'TRUE' || s2_ans === '1' });
-          if (s3_text) statements.push({ text: s3_text, isCorrect: s3_ans === 'TRUE' || s3_ans === '1' });
-          q.statements = statements;
-        } else if (qType === 'multiple_choice_multiple_answer') {
-          // MCMA: s1_text(9), s1_answer(10), s2_text(11), s2_answer(12), s3_text(13), s3_answer(14)
-          const statements: Statement[] = [];
-          const s1_text = cols[9]?.trim();
-          const s1_ans = cols[10]?.trim();
-          const s2_text = cols[11]?.trim();
-          const s2_ans = cols[12]?.trim();
-          const s3_text = cols[13]?.trim();
-          const s3_ans = cols[14]?.trim();
-
-          if (s1_text) statements.push({ text: s1_text, correctAnswer: s1_ans === 'TRUE' || s1_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-          if (s2_text) statements.push({ text: s2_text, correctAnswer: s2_ans === 'TRUE' || s2_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-          if (s3_text) statements.push({ text: s3_text, correctAnswer: s3_ans === 'TRUE' || s3_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-          q.statements = statements;
+          if (qType === 'pilihan_ganda_kompleks') {
+            q.statements = [
+              s1_text ? { text: s1_text, isCorrect: s1_ans === 'TRUE' || s1_ans === '1' } : { text: '', isCorrect: false },
+              s2_text ? { text: s2_text, isCorrect: s2_ans === 'TRUE' || s2_ans === '1' } : { text: '', isCorrect: false },
+              s3_text ? { text: s3_text, isCorrect: s3_ans === 'TRUE' || s3_ans === '1' } : { text: '', isCorrect: false },
+            ];
+          } else if (qType === 'multiple_choice_multiple_answer') {
+            q.statements = [
+              s1_text ? { text: s1_text, correctAnswer: s1_ans === 'TRUE' || s1_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+              s2_text ? { text: s2_text, correctAnswer: s2_ans === 'TRUE' || s2_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+              s3_text ? { text: s3_text, correctAnswer: s3_ans === 'TRUE' || s3_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+            ];
+          }
         }
+        
         questions.push(q);
       }
     });
@@ -615,9 +623,8 @@ export const api = {
         q.option_c = parts[6] || '';
         q.option_d = parts[7] || '';
         q.correct_answer = (parts[8] || 'A').toUpperCase() as any;
-      } else if (qType === 'pilihan_ganda_kompleks') {
-        // PK: package|subject|question|PK||||||s1_text|s1_ans|s2_text|s2_ans|s3_text|s3_ans|image
-        const statements: Statement[] = [];
+      } else {
+        // PK and MCMA: package|subject|question|type||||||s1_text|s1_ans|s2_text|s2_ans|s3_text|s3_ans|image
         const s1_text = parts[9]?.trim();
         const s1_ans = parts[10]?.trim()?.toUpperCase();
         const s2_text = parts[11]?.trim();
@@ -625,24 +632,19 @@ export const api = {
         const s3_text = parts[13]?.trim();
         const s3_ans = parts[14]?.trim()?.toUpperCase();
 
-        if (s1_text) statements.push({ text: s1_text, isCorrect: s1_ans === 'TRUE' || s1_ans === '1' });
-        if (s2_text) statements.push({ text: s2_text, isCorrect: s2_ans === 'TRUE' || s2_ans === '1' });
-        if (s3_text) statements.push({ text: s3_text, isCorrect: s3_ans === 'TRUE' || s3_ans === '1' });
-        q.statements = statements;
-      } else if (qType === 'multiple_choice_multiple_answer') {
-        // MCMA: package|subject|question|MCMA||||||s1_text|s1_ans|s2_text|s2_ans|s3_text|s3_ans|image
-        const statements: Statement[] = [];
-        const s1_text = parts[9]?.trim();
-        const s1_ans = parts[10]?.trim();
-        const s2_text = parts[11]?.trim();
-        const s2_ans = parts[12]?.trim();
-        const s3_text = parts[13]?.trim();
-        const s3_ans = parts[14]?.trim();
-
-        if (s1_text) statements.push({ text: s1_text, correctAnswer: s1_ans === 'TRUE' || s1_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-        if (s2_text) statements.push({ text: s2_text, correctAnswer: s2_ans === 'TRUE' || s2_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-        if (s3_text) statements.push({ text: s3_text, correctAnswer: s3_ans === 'TRUE' || s3_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' });
-        q.statements = statements;
+        if (qType === 'pilihan_ganda_kompleks') {
+          q.statements = [
+            s1_text ? { text: s1_text, isCorrect: s1_ans === 'TRUE' || s1_ans === '1' } : { text: '', isCorrect: false },
+            s2_text ? { text: s2_text, isCorrect: s2_ans === 'TRUE' || s2_ans === '1' } : { text: '', isCorrect: false },
+            s3_text ? { text: s3_text, isCorrect: s3_ans === 'TRUE' || s3_ans === '1' } : { text: '', isCorrect: false },
+          ];
+        } else if (qType === 'multiple_choice_multiple_answer') {
+          q.statements = [
+            s1_text ? { text: s1_text, correctAnswer: s1_ans === 'TRUE' || s1_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+            s2_text ? { text: s2_text, correctAnswer: s2_ans === 'TRUE' || s2_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+            s3_text ? { text: s3_text, correctAnswer: s3_ans === 'TRUE' || s3_ans === 'S' ? 'Sesuai' : 'Tidak Sesuai' } : { text: '', correctAnswer: 'Tidak Sesuai' },
+          ];
+        }
       }
 
       return q;
