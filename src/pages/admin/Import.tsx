@@ -19,10 +19,10 @@ const Import = () => {
 
     if (type === 'questions') {
       if (format === 'csv') {
-        headers = 'package,subject,question,type,option_a,option_b,option_c,option_d,correct_answer,s1_text,s1_ans,s2_text,s2_ans,s3_text,s3_ans,image';
-        rows = 'TO-1,IPA,Apa ibu kota Indonesia?,pilihan_ganda,Jakarta,Bandung,Surabaya,Medan,A,,,,,,,https://placehold.co/600x400?text=Jakarta\n' +
-          'TO-1,IPA,Pernyataan tentang mamalia,pilihan_ganda_kompleks,,,,, ,Bernapas dengan paru-paru,Benar,Memiliki daun telinga,Benar,Bertelur,Salah,\n' +
-          'LATIHAN-A,BI,Kesesuaian tata surya,multiple_choice_multiple_answer,,,,, ,Bumi mengelilingi matahari,Sesuai,Matahari adalah planet,Tidak Sesuai,Pluto adalah planet kerdil,Sesuai,';
+        headers = 'package,subject,question,type,option_a,option_b,option_c,option_d,correct_answer,s1_text,s1_answer,s2_text,s2_answer,s3_text,s3_answer,image';
+        rows = 'Default,Math,1+1=?,PG,1,2,3,4,B,,,,,,,\n' +
+          'Default,Bio,Tumbuhan,PK,,,,,, ,Memiliki daun,TRUE,Memiliki akar,TRUE,Bisa berjalan,FALSE,\n' +
+          'Default,IPA,Energi,MCMA,,,,,, ,Panas adalah energi,S,Suara adalah energi,S,Cahaya berhenti,T,';
         filename = 'template_soal.csv';
         content = '\ufeff' + headers + '\n' + rows;
       } else {
@@ -245,14 +245,16 @@ const Import = () => {
                   </div>
                   <p className="text-sm text-text-muted">
                     {activeTab === 'students'
-                      ? "Tempel daftar siswa di bawah. Format: Nama | Sekolah (satu per baris)."
-                      : "Tempel soal pilihan ganda di bawah. Format: Soal | A | B | C | D | Jawaban(A/B/C/D)."}
+                      ? "Tempel daftar siswa di bawah. Format: username | password | nama | sekolah (satu per baris)."
+                      : "Tempel soal di bawah sesuai tipe. Format: package|subject|question|type|[fields sesuai tipe]|image (satu per baris)."}
                   </p>
 
                   <textarea
                     value={quickPasteText}
                     onChange={(e) => setQuickPasteText(e.target.value)}
-                    placeholder={activeTab === 'students' ? "Contoh:\nBudi Santoso | SDN 01 Jakarta\nSiti Aminah | SDN 02 Jakarta" : "Contoh:\nApa ibu kota Indonesia? | Jakarta | Bandung | Surabaya | Medan | A"}
+                    placeholder={activeTab === 'students' 
+                      ? "Contoh:\nsiswa01|pass123|Budi Santoso|SDN 01 Jakarta\nsiswa02|pass123|Siti Aminah|SDN 01 Jakarta" 
+                      : "Contoh PG:\nDefault|Math|1+1=?|PG|1|2|3|4|B|\nContoh PK:\nDefault|Bio|Tumbuhan|PK||||||Daun|TRUE|Akar|TRUE|Jalan|FALSE|\nContoh MCMA:\nDefault|IPA|Energi|MCMA||||||Panas|S|Suara|S|Cahaya|T|"}
                     className="w-full h-64 p-4 rounded-xl bg-background border border-border font-mono text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
                   />
 
@@ -283,8 +285,8 @@ const Import = () => {
                 </h4>
                 <p className="text-xs text-text-muted leading-relaxed">
                   {activeTab === 'students'
-                    ? "Wajib memiliki header: username, password, name, school."
-                    : "Wajib memiliki 16 kolom sesuai template soal."}
+                    ? "Wajib memiliki 4 kolom: username, password, name, school."
+                    : "Wajib 16 kolom: package,subject,question,type,option_a,option_b,option_c,option_d,correct_answer,s1_text,s1_answer,s2_text,s2_answer,s3_text,s3_answer,image. PG gunakan kolom 4-8, PK/MCMA gunakan kolom 9-15."}
                 </p>
               </div>
 
