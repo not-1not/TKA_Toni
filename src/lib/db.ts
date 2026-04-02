@@ -399,11 +399,16 @@ export const api = {
       durationSeconds: res.durationSeconds
     };
     
-    const dbResult = {
-      ...res,
-      details: JSON.stringify(detailsData),
-      answerDetails: undefined, // Remove from top level
-      durationSeconds: undefined // Remove from top level
+    const dbResult: any = {
+      id: res.id,
+      studentId: res.studentId,
+      studentName: res.studentName,
+      school: res.school,
+      correct: res.correct,
+      wrong: res.wrong,
+      score: res.score,
+      timestamp: res.timestamp,
+      details: JSON.stringify(detailsData)
     };
     
     const { error } = await supabase.from('results').insert([dbResult]);
@@ -416,11 +421,13 @@ export const api = {
       durationSeconds: res.durationSeconds
     };
     
-    const dbResult = {
-      ...res,
-      details: JSON.stringify(detailsData),
-      answerDetails: undefined, // Remove from top level
-      durationSeconds: undefined // Remove from top level
+    const dbResult: any = {
+      studentName: res.studentName,
+      school: res.school,
+      correct: res.correct,
+      wrong: res.wrong,
+      score: res.score,
+      details: JSON.stringify(detailsData)
     };
     
     const { error } = await supabase.from('results').update(dbResult).eq('id', res.id);

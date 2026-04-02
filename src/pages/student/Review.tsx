@@ -120,8 +120,9 @@ const Review = () => {
         // Pass resultID securely
         navigate('/result', { state: { resultId: result.id }, replace: true });
     } catch (err) {
-        console.error("Submit error:", err);
-        alert("Failed to submit exam. Please check your connection and try again.");
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.error("Submit error:", errorMsg);
+        alert(`Failed to submit exam: ${errorMsg}`);
     } finally {
         setIsSubmitting(false);
     }
