@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { api, ExamToken, Question, ExamState, Result } from '../../lib/db';
+import { api, ExamToken, Question, ExamState, Result, AnswerDetail } from '../../lib/db';
 import { calculateScore, formatTime } from '../../lib/utils';
 import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 
@@ -69,6 +69,38 @@ const Review = () => {
     try {
         const { correct, wrong, score } = calculateScore(questions, examState.answers);
         
+        // Build answer details for analysis
+        const answerDetails: AnswerDetail[] = questions.map(q => {
+          const studentAnswer = examState.answers[q.id];
+          let correctAnswer: any;
+          let isCorrect = false;
+
+          if (q.type === 'pilihan_ganda') {
+            correctAnswer = q.correct_answer;
+            isCorrect = studentAnswer === q.correct_answer;
+          } else if (q.type === 'pilihan_ganda_kompleks') {
+            const selectedIndices = (studentAnswer as number[]) || [];
+            const correctIndices = q.statements?.map((s, i) => s.isCorrect ? i : -1).filter(i => i !== -1) || [];
+            correctAnswer = correctIndices;
+            isCorrect = selectedIndices.length === correctIndices.length && 
+                        selectedIndices.every(i => correctIndices.includes(i));
+          } else if (q.type === 'multiple_choice_multiple_answer') {
+            const statementAnswers = (studentAnswer as Record<number, string>) || {};
+            correctAnswer = q.statements?.map(s => s.correctAnswer) || [];
+            isCorrect = q.statements?.every((s, i) => statementAnswers[i] === s.correctAnswer);
+          }
+
+          return {
+            questionId: q.id,
+            question: q.question,
+            type: q.type,
+            studentAnswer: studentAnswer || null,
+            correctAnswer,
+            isCorrect,
+            subject: q.subject
+          };
+        });
+        
         const result: Result = {
           id: 'RES-' + Math.random().toString(36).substring(2, 9),
           studentId: auth.student.id,
@@ -77,7 +109,9 @@ const Review = () => {
           correct,
           wrong,
           score,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          answerDetails,
+          durationSeconds: examState.endTime ? Math.round((examState.endTime - (examState.startTime || 0)) / 1000) : 0
         };
         
         await api.addResult(result);
@@ -86,6 +120,7 @@ const Review = () => {
         // Pass resultID securely
         navigate('/result', { state: { resultId: result.id }, replace: true });
     } catch (err) {
+        console.error("Submit error:", err);
         alert("Failed to submit exam. Please check your connection and try again.");
     } finally {
         setIsSubmitting(false);

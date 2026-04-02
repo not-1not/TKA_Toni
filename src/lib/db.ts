@@ -60,6 +60,16 @@ export type Answer = {
   selectedAnswer: any; // Flexible answer type
 };
 
+export type AnswerDetail = {
+  questionId: string;
+  question: string;
+  type: QuestionType;
+  studentAnswer: any;
+  correctAnswer: any;
+  isCorrect: boolean;
+  subject: string;
+};
+
 export type Result = {
   id: string;
   studentId: string;
@@ -69,6 +79,8 @@ export type Result = {
   wrong: number;
   score: number;
   timestamp: string;
+  answerDetails?: AnswerDetail[]; // Detailed answer analysis
+  durationSeconds?: number; // Exam duration in seconds
 };
 
 export type ExamState = {
